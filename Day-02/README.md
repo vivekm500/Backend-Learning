@@ -57,4 +57,4 @@ so use  "npx nodemon server.js"   this will kwwp updating server.js as we will m
 --npx -> it is package executer
 
 ------------------------------
-if you want any file not to get uploded on github then create a file called   ".gitignore"  and inside it write "node_module"  ".env"   so .env file will get ignored by github and will not be uploaded there
+if you want any file not to get uploded on github then create a file called   ".gitignore"  and inside it write the files you don't want to upload like "Day-02/node_module/"  and ".env"   so node_modules in Day-02 and .env file will get ignored by github and will not be uploaded there
