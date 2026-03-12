@@ -58,3 +58,12 @@ so use  "npx nodemon server.js"   this will kwwp updating server.js as we will m
 
 ------------------------------
 if you want any file not to get uploded on github then create a file called   ".gitignore"  and inside it write the files you don't want to upload like "Day-02/node_module/"  and ".env"   so node_modules in Day-02 and .env file will get ignored by github and will not be uploaded there
+
+
+------------------------------
+
+--Deploying Server
+
+To deploy your server create a repo on github and take your code there and use any cpu provider service like render which is free and great for personel projects
+
+go to render and signin using your github then click new -> select the repo you want to deploy -> configure it -> give a name -> branc-main -> select root directory -> build command - if node_module is not there in repo then use "npm i" -> start command - npm server.js(your js file name) -> choose free service -> click deploy web service
