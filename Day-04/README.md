@@ -1,0 +1,1 @@
+WE can create our own command just add that in script section of package.json file like if i want "npx nodemon servere.js"  to run with command "npm run dev" then add "dev": "npx nodemon server.js" in the script of package.json file
