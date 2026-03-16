@@ -43,6 +43,12 @@ Security: APIs provide a structured, secure way to share data and functionality,
 
 app.use(express.json())  // its a middleware --- here it used to read the data sent from frontend
 
+--HTTP Methods
+HTTP methods define the action you want to perform on a resource. Here are 
+
+---refer to notes for more info about all HTTP methods---
+
+
 / post method ->  Creates a new resource. The request body contains the data for the new resource. 
 
 app.post('/notes', (req, res) => {
