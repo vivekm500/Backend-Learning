@@ -39,7 +39,7 @@ When your connection string says:
 ...mongodb.net/Day-06
 👉 Day-06 = your database name
 
-ut you're actually connecting to:
+but you're actually connecting to:
 👉 a cluster that contains that database
 
 --🧠 Final clarity
