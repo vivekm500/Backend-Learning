@@ -1,6 +1,9 @@
-we can use an extension --env masker-- to hide the url's in .env file
 
 ----------------------------------------------------
+BACKEND
+
+we can use an extension --env masker-- to hide the url's in .env file
+
  Schema -> defines the format in which data will be stored on database, what will be stored and its datatype
 
  mongoose helps in creation of schema and model
@@ -50,3 +53,9 @@ const id = req.params.id
 const {description} = req.body
 await noteModel.findByIdAndUpdate(id, {description})
 ```
+
+-------------------------------------------------
+FRONTEND
+
+use command "npm create vite@latest ." to create a folder structure for frontend
+
