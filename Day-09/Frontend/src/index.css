@@ -22,6 +22,7 @@ html{
   gap: 1rem;
   padding-block: 1rem;
   padding-inline: 3rem;
+  flex-wrap: wrap;
 }
 
 .note{
@@ -29,5 +30,5 @@ html{
   padding: 1rem;
   border-radius: 0.7rem;
   max-width: 20rem;
-  height: fit-content;
+  height: auto;
 }

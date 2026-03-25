@@ -59,3 +59,23 @@ FRONTEND
 
 use command "npm create vite@latest ." to create a folder structure for frontend
 
+we will use axios to make a request to api
+first do install axios in frontend with command "npm i axios"
+
+axios.get/post/patch/delete/any method you want to perform('api')
+
+```js
+axios.get('api').then()
+```
+
+A CORS policy error is a security alert that occurs when a web browser blocks a web page from making an HTTP request to a different origin (domain, protocol, or port) than the one that served the page. This is a fundamental browser security measure designed to prevent malicious activity, known as the Same-Origin Policy (SOP). 
+
+Cross-Origin Resource Sharing (CORS) is a mechanism that adds flexibility to the strict SOP by using special HTTP headers to explicitly allow some cross-origin requests while rejecting others. A CORS error happens when the server you are trying to access does not include the necessary CORS headers in its response to grant permission to the requesting origin.
+
+So to make cross origin request we will use cors
+-- first install cors packsge in backend with command "npm i cors"
+-- then require it in app.js and write the code app.use(cors())
+```js
+const cors = require("cors")
+app.use(cors())
+```

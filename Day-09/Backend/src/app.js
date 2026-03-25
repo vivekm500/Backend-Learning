@@ -4,9 +4,13 @@ const express = require("express")
 
 const noteModel = require("./models/note.model.js");
 
+const cors = require("cors")
+
 const app = express()
 
 app.use(express.json()) // middleware to read json data
+
+app.use(cors()) // to accept cross origin request // here from frontend because frontend is running on different port
 
 
 
