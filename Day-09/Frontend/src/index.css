@@ -32,3 +32,10 @@ html{
   max-width: 20rem;
   height: auto;
 }
+
+.note-create-form{
+  display: flex;
+  gap: 1rem;
+  padding-block: 1rem;
+  padding-inline: 3rem;
+}

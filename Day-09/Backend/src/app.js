@@ -8,7 +8,11 @@ const cors = require("cors")
 
 const app = express()
 
+const path =require("path")
+
 app.use(express.json()) // middleware to read json data
+
+app.use(express.static("./public"))  // middleware to make all from folder publically available
 
 app.use(cors()) // to accept cross origin request // here from frontend because frontend is running on different port
 
@@ -77,6 +81,14 @@ app.patch('/api/notes/:id', async (req,res)=>{
     res.status(200).json({
         message: "note updated successfully"
     })
+})
+
+
+// handling wildcard api
+app.use('*name', (req,res)=>{
+    // res.send("this is wildcard")
+
+    res.sendFile(path.join(__dirname, "..", "./public/index.html"));
 })
 
 module.exports = app

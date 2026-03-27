@@ -79,3 +79,60 @@ So to make cross origin request we will use cors
 const cors = require("cors")
 app.use(cors())
 ```
+
+------------------------------------------------------
+Day-10 lec
+
+As of we now our frontend is running on different port and backend is running on different so to integrate them on single port and can run on single port
+
+-- run the commmand "npm run build" in frontend folder
+-- this command will sum of all react codes in html css and javascript , css and javascript will be in a foldrer named asses all these will in a folder  named dist and dist folder will also conatin any asset like photo or video or font you have used in the frontend
+
+
+**Now move all the three html css and javascript files/folder created on running the command npm run build to a public folder in backend folder
+
+---------------------------------------------
+
+in backend in app.js we will send response for the api's that is not created by us
+
+```js
+
+const path = require("path") // a middleware to use path.join
+
+
+
+app.use('*name', (req,res)=>{
+    // res.send("this is wildcard")  // now if any request to any api that i haven't created then this response will be send
+
+    // we will send html.index file in response which we taken out fron frontend by running the command "npm run build" in frontend
+    res.sendFile(path.join(__dirname, "..", "./public/index.html"))
+})
+
+__dirname // jis v folder ke andar isse chalaoge to ye uss file ke folder tak ka path return krta h
+
+".." // to go back from src to public
+
+
+app.use(express.static("./public"))  // middleware to make all from folder publically available so that when we browser makes a request on server from any api that we haven't created then it should able to acess all html,css and js file from public folder and load the frontend from the same  port that is used on backend
+
+// so now our frontend and backend is running on same port both get integrated
+
+// if any requested file from browser is not found in public folder then it will send html file as we have send html file in response in wildcard api
+
+```
+
+if you change frontend code later?
+
+Nothing happens automatically.
+
+Your backend is still serving the old build files, not your updated code.
+
+What you MUST do after frontend changes
+
+Every time you update frontend:
+
+Go to frontend folder
+
+Run: npm run build
+Replace old files in backend public/ with new ones
+If you skip this → your changes will NOT show.
