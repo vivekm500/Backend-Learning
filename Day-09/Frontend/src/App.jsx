@@ -8,7 +8,9 @@ import axios from 'axios'
 
    function fetchNotes(){
      axios
-       .get("http://localhost:3000/api/notes")
+       .get(
+         "https://backend-learning-day-02-server-deploy.onrender.com/api/notes",
+       )
        .then((res) => {
          console.log(res.data);
          setnotes(res.data.NotesData);
@@ -34,25 +36,32 @@ import axios from 'axios'
     console.log(title.value,description.value)
 
     axios
-      .post("http://localhost:3000/api/notes", {
-        title: title.value,
-        description: description.value,
-      })
+      .post(
+        "https://backend-learning-day-02-server-deploy.onrender.com/api/notes",
+        {
+          title: title.value,
+          description: description.value,
+        },
+      )
       .then((res) => {
         console.log(res.data);
 
-        fetchNotes()
+        fetchNotes();
       });
    }
 
    function handleDelete(noteId){
     console.log(noteId)
 
-    axios.delete("http://localhost:3000/api/notes/"+noteId)
-    .then((res)=>{
-      console.log(res.data)
-      fetchNotes()  // to render or dispaly all notes after deletion 
-    })
+    axios
+      .delete(
+        "https://backend-learning-day-02-server-deploy.onrender.com/api/notes/" +
+          noteId,
+      )
+      .then((res) => {
+        console.log(res.data);
+        fetchNotes(); // to render or dispaly all notes after deletion
+      });
    }
 
 

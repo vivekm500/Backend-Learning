@@ -136,3 +136,18 @@ Go to frontend folder
 Run: npm run build
 Replace old files in backend public/ with new ones
 If you skip this → your changes will NOT show.
+
+
+----------------------------------------------
+DEPLOYING ON RENDER
+
+deploy on render
+set root directory to day-09/Backend
+- add your MONGO_URI from env in environment variable as env we haven't uploaded on github
+- afrer doing all this step deploy
+
+-- After deploying replace the localhost:3000 wherever used with url you get from render after deploying
+
+-- now again run the command "npm run build" in frontend folder and replace the content in public folder of backend with the updated dist folder of frontend
+
+-- now redeploy it on render
