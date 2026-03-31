@@ -1,0 +1,74 @@
+-- AUTUHENTICATION SYSTEM 
+authentication system is the mechanism used to verify the identity of a user, device, or system before granting access to protected resources. It essentially answers the question, "Who are you?"
+
+-1. AAUTHENTICATION
+identify krna ki request kis user se ayi hai
+
+Authentication (AuthN) is the ongoing process of proving your identity every time you log in. It compares your provided credentials against the "verified" record created during signup. 
+
+Goal: Confirm the user is the same person who originally registered.
+Example: Entering your username and password, scanning your fingerprint (FaceID), or entering an OTP (One-Time Password).
+Analogy: Using your key to open the front door of your house
+
+-2. AUTHORISATION
+user kya-kya kar sakta hai
+
+Authorisation (AuthZ) happens after a user is successfully authenticated. it determines their permissions and access levels. 
+
+Goal: Control which specific resources (pages, data, buttons) a user can interact with.
+
+Example: An "Admin" can delete users, while a "Guest" can only read posts.
+
+Analogy: Once inside the building, your badge only lets you enter the 3rd floor, not the executive suite.
+
+-3. VALIDATION
+Data ka format check karna
+
+Validation is the first step, often happening before the system even knows who the user is. It checks if the data provided matches the required format and constraints. 
+
+Goal: Ensure data integrity and prevent errors or malicious code (like SQL injection). 
+
+Example: Checking if an email address contains an "@" symbol or if a password meets the minimum length of 8 characters. 
+
+Analogy: A doorman checking if you are wearing the required "Black Tie" attire before even asking for your name. 
+
+-4. VERIFICATION
+Data sahi hai ya nhi
+
+Verification is the process of confirming that an identity is authentic and belongs to a real person. This usually happens once during onboarding or when high-risk actions are taken. 
+
+Goal: Establish a baseline of trust by matching a user to external, authoritative sources. 
+
+Example: Uploading a government ID (Passport/Driver’s License) to a banking app, or clicking a link in a "Verify your Email" message. 
+
+Analogy: A front desk clerk checking your physical ID card to make sure the face on the card matches yours. 
+
+
+
+a server authenticates a user through a multi-step process that starts with verifying credentials and ends with establishing a "persistent" session so the user doesn't have to log in for every single click. 
+
+1. The Initial Handshake (Login)
+Submission: The user enters their identifier (like an email) and secret (password) into a client-side form. The client sends this to the server over a secure HTTPS connection. 
+
+Validation: The server first performs Validation to ensure the data is safe and correctly formatted (e.g., checking if the email is valid). 
+
+Credential Check: The server looks up the user in its database. To keep passwords secure, the server never stores them in plain text; instead, it uses a hashing algorithm (like bcrypt) to compare the submitted password against the stored hash. 
+
+2. Maintaining the "Logged-In" State
+HTTP is stateless, meaning the server "forgets" the user after every request. To keep them logged in, the server uses one of two main strategies: 
+
+
+**A. Session-Based Authentication (Stateful)**
+Creation: After a successful login, the server creates a Session ID and stores it in its own memory or a database (like Redis). 
+
+The Cookie: The server sends this Session ID back to the browser in a Set-Cookie header. The browser automatically stores this cookie. 
+
+Recognition: For every future request, the browser automatically attaches that cookie. The server checks the ID against its list to find exactly who the user is. 
+
+
+**B. Token-Based Authentication (Stateless - e.g., JWT)**
+Generation: The server creates a digital "ticket" called a JSON Web Token (JWT) that contains the user's info (like their ID). This token is cryptographically signed with a secret key known only to the server. 
+
+The Handover: The token is sent to the client, which stores it in localStorage or a secure cookie. 
+
+Self-Verification: The client sends this token in the Authorization header of every request. The server doesn't need to look at a database; it simply verifies the signature to know the token is valid and who it belongs to. 
