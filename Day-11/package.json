@@ -1,0 +1,20 @@
+{
+  "name": "day-10",
+  "version": "1.0.0",
+  "description": "-- AUTUHENTICATION SYSTEM \r authentication system is the mechanism used to verify the identity of a user, device, or system before granting access to protected resources. It essentially answers the question, \"Who are you?\"",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "npx nodemon server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cookie-parser": "^1.4.7",
+    "dotenv": "^17.3.1",
+    "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^9.3.3"
+  }
+}
