@@ -104,6 +104,7 @@ Login → Verify User → Match Password → Generate Token → Store Cookie
 Protected → (Currently just reads cookies, no security)
 
 -------------------------------------------
-Hashing 
+--Hashing 
 in hashing same input will always generate same output
 hash is one way hash can't be converted back to string
+we use hashing algorithm to hash the password like "md5" or S"HA-2"
