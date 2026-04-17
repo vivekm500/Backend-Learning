@@ -1,0 +1,30 @@
+IMPLEMENTATION
+
+==> Authentication
+   => register (1. user  ka data save krna, 2. token user ko dena)
+   => login
+   => logoout (token blacklisting)
+   => [otp based registration]
+
+==> Post
+   => create
+   => can see feed
+   => like posts (collection types)
+   => save post
+
+==> Users
+   => followers
+   => following
+
+
+---------------------------------------
+
+User schema
+
+user = {
+   username: String,
+   email: String,
+   password: String,
+   bio: String,
+   profile_image: String
+}
