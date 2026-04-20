@@ -2,7 +2,9 @@ const express = require("express")
 
 const userModel = require("../models/user.model")
 
-const crypto = require("crypto")
+// const crypto = require("crypto")
+
+const bcrypt = require("bcryptjs")
 
 const jwt = require("jsonwebtoken")
 
@@ -43,7 +45,9 @@ async function registerController(req,res){
     });
   }
 
-  const hash = crypto.createHash("sha256").update(password).digest("hex");
+//   const hash = crypto.createHash("sha256").update(password).digest("hex");
+
+const hash = await bcrypt.hash(password, 10)
 
   const user = await userModel.create({
     username,
@@ -78,59 +82,65 @@ async function registerController(req,res){
 
 // login
 async function loginController(req,res){
+  const { username, email, password } = req.body;
 
-    const {username, email, password} = req.body
+  /**
+   * username
+   * password
+   *
+   * email
+   * password
+   */
 
-    /**
-     * username 
-     * password
-     * 
-     * email
-     * password
-     */
+  const user = await userModel.findOne({
+    $or: [
+      {
+        username: username,
+      },
+      {
+        email: email,
+      },
+    ],
+  });
 
-    const user = await userModel.findOne({
-        $or: [
-            {
-                username: username  
-            },
-            {
-                email: email 
-            }
-        ]
-    })
+  if (!user) {
+    return res.status(404).json({
+      message: "user not found",
+    });
+  }
 
-    if(!user){
-        return res.status(404).json({
-            message: "user not found"
-        })
-    }
+  // const hash = crypto.createHash('sha256').update(password).digest('hex')
 
-    const hash = crypto.createHash('sha256').update(password).digest('hex')
+  // const isPasswordValild = hash == user.password
 
-    const isPasswordValild = hash == user.password
+  // first convert the password in hash then compare it with hashedpassword stored in db
+  const isPasswordValild = await bcrypt.compare(password, user.password);
 
-    if(!isPasswordValild){
-        return res.status(401).json({
-            message: "password is invalid"
-        })
-    }
+  if (!isPasswordValild) {
+    return res.status(401).json({
+      message: "password is invalid",
+    });
+  }
 
-    const token = jwt.sign({
-        id: user._id
-    }, process.env.JWT_SECRET, {expiresIn: "1d"})
+  const token = jwt.sign(
+    {
+      id: user._id,
+    },
+    process.env.JWT_SECRET,
+    { expiresIn: "1d" },
+  );
 
-    res.cookie("login-token", token)
+  res.cookie("login-token", token);
 
-    res.status(210).json({
-        messgae: "user logged in succeessfully",
-        user: {
-            username: user.username,
-            email: user.email,
-            bio: user.bio,
-            profileImage: user.profileImage
-        }
-    })
+  res.status(210).json({
+    messgae: "user logged in succeessfully",
+    user: {
+      username: user.username,
+      email: user.email,
+      bio: user.bio,
+      profileImage: user.profileImage,
+    },
+  });
 }
 
 
