@@ -130,7 +130,7 @@ async function loginController(req,res){
     { expiresIn: "1d" },
   );
 
-  res.cookie("login-token", token);
+  res.cookie("token", token);
 
   res.status(210).json({
     messgae: "user logged in succeessfully",
