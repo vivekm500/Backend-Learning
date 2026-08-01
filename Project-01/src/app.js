@@ -10,7 +10,7 @@ const app = express();
 
 app.use(express.json())
 
-app.use(cookieParser())
+app.use(cookieParser())  // used as middleware
 
 
 app.use("/api/auth", authRouter)
