@@ -7,6 +7,9 @@ const postController = require("../controllers/post.controllers")
 const multer = require("multer") // to read form-data
 const authRouter = require("./auth.routes")
 
+// identifyUser middleware
+const identifyUser = require("../middleware/auth.middleware")
+
 const upload = multer({ storage:multer.memoryStorage() }) // setting storage location to memory-storage(RAM temprorary)
 
 /**
@@ -14,14 +17,14 @@ const upload = multer({ storage:multer.memoryStorage() }) // setting storage loc
  * req.body = {caption, image-file}
  */
 
-postRouter.post("/", upload.single("image"), postController.createPostController)
+postRouter.post("/", upload.single("image"), identifyUser,  postController.createPostController)
 
 
 /**
  * GET - 'api/posts'  (protected)
  */
 
-postRouter.get("/", postController.getPostController)
+postRouter.get("/", identifyUser, postController.getPostController)
 
 
 
@@ -30,6 +33,6 @@ postRouter.get("/", postController.getPostController)
  * returns detail about specific post with its id. also checks the post belons to the user that the request come from
  */
 
-postRouter.get("/details/:postId", postController.getPostDetailsController)
+postRouter.get("/details/:postId", identifyUser, postController.getPostDetailsController)
 
 module.exports = postRouter

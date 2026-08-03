@@ -334,3 +334,8 @@ if (id1.toString() === id2.toString()) {
   // The IDs match
 }
 ```
+
+
+
+-----------------------
+ Do read edge collection and indexing from this repo -> https://github.com/ankurdotio/cohort-2.0/tree/main/notes
