@@ -338,4 +338,263 @@ if (id1.toString() === id2.toString()) {
 
 
 -----------------------
- Do read edge collection and indexing from this repo -> https://github.com/ankurdotio/cohort-2.0/tree/main/notes
+ **Do read edge collection and indexing from this repo -> https://github.com/ankurdotio/cohort-2.0/tree/main/notes**
+
+
+
+-----------------------------
+
+**followSchema.index({follower: 1, followee: 1}, {unique: true})**
+
+his line creates a compound unique index in MongoDB.
+
+```js
+followSchema.index(
+    { follower: 1, followee: 1 },
+    { unique: true }
+);
+```
+
+Let's break it down.
+
+What is an Index?
+
+An index is like the index at the back of a book.
+
+Without an index:
+
+Book
+--------------------------------
+Page 1
+Page 2
+Page 3
+...
+Page 500
+
+To find "Trees", you'd have to scan many pages.
+
+With an index:
+
+Index
+-------
+Arrays -> Page 25
+Graphs -> Page 120
+Trees -> Page 300
+
+You immediately know where to look.
+
+MongoDB works similarly. An index allows it to find documents much faster.
+
+What does this mean?
+{ follower: 1, followee: 1 }
+
+This creates an index using two fields together.
+
+First sort by follower
+Then by followee
+
+The 1 means ascending order.
+
+You could also write:
+
+{ follower: -1, followee: -1 }
+
+where -1 means descending.
+
+For equality searches (findOne), 1 vs -1 doesn't matter much.
+
+What is a Compound Index?
+
+Suppose your collection contains:
+
+follower	followee
+Alice	Bob
+Alice	Charlie
+Alice	David
+Bob	Alice
+Bob	Charlie
+
+The index stores combinations like:
+
+Alice -> Bob
+Alice -> Charlie
+Alice -> David
+Bob -> Alice
+Bob -> Charlie
+
+Now when you run
+
+```js
+followModel.findOne({
+    follower: "Alice",
+    followee: "Charlie"
+});
+```
+
+MongoDB can directly jump to that combination instead of scanning every document.
+
+What does unique: true mean?
+
+This is the important part.
+
+```js
+{ unique: true }
+```
+
+It tells MongoDB:
+
+Never allow two documents with the same (follower, followee) pair.
+
+Without it:
+
+Alice follows Bob
+Alice follows Bob
+Alice follows Bob
+Alice follows Bob
+
+MongoDB accepts all of them.
+
+Collection:
+
+follower	followee
+Alice	Bob
+Alice	Bob
+Alice	Bob
+
+With unique: true:
+
+First insert:
+
+{
+    follower: "Alice",
+    followee: "Bob"
+}
+
+✅ Success
+
+Second insert:
+
+{
+    follower: "Alice",
+    followee: "Bob"
+}
+
+❌ MongoDB throws an error:
+
+E11000 duplicate key error
+
+No duplicate document is created.
+
+Notice something important
+
+This doesn't prevent:
+
+Alice -> Bob
+Bob -> Alice
+
+because these are different pairs.
+
+(Alice, Bob)
+(Bob, Alice)
+
+Both are allowed.
+
+Why is this better than findOne()?
+
+Suppose two requests arrive at the same time.
+
+Request A
+
+findOne()
+
+returns null
+
+Before it inserts...
+
+Request B
+
+findOne()
+
+also returns null
+
+Now both execute
+
+create()
+
+Result:
+
+Alice -> Bob
+Alice -> Bob
+
+Two identical records.
+
+This is called a race condition.
+
+With the unique index:
+
+Request A inserts first.
+
+Request B also tries to insert.
+
+MongoDB checks the index and says:
+
+Duplicate key.
+Rejected.
+
+Only one document exists.
+
+How do you handle the duplicate error?
+```js
+try {
+    await followModel.create({
+        follower,
+        followee
+    });
+} catch (err) {
+    if (err.code === 11000) {
+        return res.status(409).json({
+            message: "Already following"
+        });
+    }
+
+    throw err;
+}
+```
+
+11000 is MongoDB's duplicate key error code.
+
+Visual summary
+
+Without index:
+
+Collection
+
+Alice -> Bob
+Alice -> Bob
+Alice -> Bob
+
+With
+```js
+followSchema.index(
+    { follower: 1, followee: 1 },
+    { unique: true }
+);
+```
+Insert #1
+Alice -> Bob
+✅ Allowed
+
+Insert #2
+Alice -> Bob
+❌ Rejected
+
+Insert #3
+Alice -> Charlie
+✅ Allowed
+
+Insert #4
+Bob -> Alice
+✅ Allowed
+
+So this one line both speeds up lookups on (follower, followee) and guarantees that the same user cannot follow the same account more than once, even if multiple requests hit your server simultaneously.
+

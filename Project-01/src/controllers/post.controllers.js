@@ -9,6 +9,9 @@ const Imagekit = require("@imagekit/nodejs")
 const {toFile} = require("@imagekit/nodejs")
 
 const jwt = require("jsonwebtoken")
+const { post } = require("../routes/auth.routes")
+
+const likeModel  = require("../models/like.model")
 
 require("dotenv").config();
 
@@ -166,8 +169,40 @@ async function getPostDetailsController(req, res){
 }
 
 
+
+// like post
+
+async function likePostController(req, res){
+
+  // taking out the username of the user who wants to like a specific post
+  const username = req.user.username
+
+  // take out the postid provided in params of api
+  const postid = req.params.postid
+
+  const post = postModel.findById(postid)
+
+  if(!post){
+    return res.status(404).json({
+      message: "post not found"
+    })
+  }
+
+  const like = likeModel.create({
+    post: postid,
+    user: username
+  })
+
+  res.status(200).json({
+    message: "post liked successfully",
+    like
+  })
+}
+
+
 module.exports = {
     createPostController,
     getPostController,
-    getPostDetailsController
+    getPostDetailsController,
+    likePostController
 };

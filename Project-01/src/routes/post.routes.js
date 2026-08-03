@@ -35,4 +35,12 @@ postRouter.get("/", identifyUser, postController.getPostController)
 
 postRouter.get("/details/:postId", identifyUser, postController.getPostDetailsController)
 
+
+/**
+ * @route post -> "/api/posts/like/:postid"
+ * @description like a post with the id provided in params
+ */
+
+postRouter.post("/like/:postid", identifyUser, postController.likePostController)
+
 module.exports = postRouter
