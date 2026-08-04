@@ -5,6 +5,7 @@ const userRouter = express.Router()
 const userController = require("../controllers/user.controller")
 
 const identifyUser = require("../middleware/auth.middleware")
+const authRouter = require("./auth.routes")
 
 /**
  * @route post -> "/api/users/follow/:username"
@@ -24,6 +25,21 @@ userRouter.post("/follow/:username", identifyUser, userController.followControll
 userRouter.post("/unfollow/:username", identifyUser, userController.unfollowUserController)
 
 
+/**
+ * @route patch -> "/api/users/follow/:username/accept"
+ * @description accept a pending follow request
+ * @acess private
+ */
+
+userRouter.patch("/follow/:username/accept", identifyUser, userController.followAcceptController)
+
+
+/**
+ * @route patch -> "/api/users/follow/:username/reject"
+ * @description reject a pending follow request
+ * @access private
+ */
+userRouter.patch("/follow/:username/reject", identifyUser, userController.followRejectController)
 
 
 module.exports = userRouter
