@@ -11,16 +11,37 @@ const Register = () => {
     const [email, setemail] = useState("");
     const [password, setpassword] = useState("");
 
+    async function handleFormSubmimt(e){
+      e.preventDefault();
 
+      axios.post("http://localhost:3000/api/auth/register", {
+        username,
+        email,
+        password
+      },
+    {
+      withCredentials: true  // it will set the cookies
+    })
+      .then(res =>{
+        console.log(res.data)
+      })
+    }
 
   return (
     <main>
       <div className="form-container">
         <h1>Register</h1>
-        <form>
-          <input type="text" name="username" placeholder="enter username" />
-          <input type="text" name="email" placeholder="enter email" />
-          <input
+        <form onSubmit={handleFormSubmimt}>
+          <input onChange={(e)=>{
+            setusername(e.target.value)}}
+            type="text" name="username" placeholder="enter username" />
+
+          <input onChange={(e)=>{setemail(e.target.value)}}
+           type="email" 
+           name="email" 
+           placeholder="enter email" />
+
+          <input onChange={(e)=>{setpassword(e.target.value)}}
             type="passwword"
             name="password"
             placeholder="enter password"
