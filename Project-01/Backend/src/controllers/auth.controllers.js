@@ -146,8 +146,34 @@ async function loginController(req,res){
 }
 
 
+
+// getMeController -> get the information of logged in user
+async function getMeController(req, res){
+
+  userId = req.user.id  // req.user came from identifyUser middleware
+
+  const user = await userModel.findById(userId)
+
+  if(!user){
+    return res.status(409).json({
+      message: "user not found"
+    })
+  }
+
+  res.status(200).json({
+    user: {
+      username: user.username,
+      email: user.email,
+      bio: user.bio,
+      profileImage: user.profileImage
+    }
+  })
+
+}
+
 module.exports = {
     registerController,
-    loginController
+    loginController,
+    getMeController
 }
 
