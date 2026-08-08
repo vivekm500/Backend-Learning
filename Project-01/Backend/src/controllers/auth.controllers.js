@@ -102,7 +102,7 @@ async function loginController(req,res){
         email: email,
       },
     ],
-  });
+  }).select("+password")  // in user schema we set not to read the password so here for login we need to read the password from the DB so we are forcing mongoose to read the password here
 
   if (!user) {
     return res.status(404).json({

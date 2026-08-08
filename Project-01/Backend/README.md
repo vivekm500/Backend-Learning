@@ -598,3 +598,648 @@ Bob -> Alice
 
 So this one line both speeds up lookups on (follower, followee) and guarantees that the same user cannot follow the same account more than once, even if multiple requests hit your server simultaneously.
 
+
+-------------------------
+
+**getFeedController**
+
+
+This controller is doing three main things:
+
+Fetching all posts.
+Adding the user information to each post using populate().
+Checking whether the currently logged-in user liked each post, then adding isLiked: true/false.
+
+The complete flow is:
+
+Request
+  ↓
+getFeedController()
+  ↓
+Find all posts
+  ↓
+Populate user information
+  ↓
+For every post
+  ↓
+Check whether current user liked it
+  ↓
+Add isLiked
+  ↓
+Return posts to frontend
+
+Let's break down every line.
+
+1. Controller function
+async function getFeedController(req, res) {
+
+This is an Express controller.
+
+req contains information about the incoming request.
+
+res is used to send the response back to the frontend.
+
+It's async because you're going to perform database operations using await.
+
+2. Get the logged-in user
+const user = req.user;
+
+Some authentication middleware probably ran before this controller.
+
+For example:
+
+router.get(
+    "/feed",
+    identifyUser,
+    getFeedController
+);
+
+Your identifyUser middleware probably does something like:
+
+req.user = user;
+
+So by the time your controller runs:
+
+req.user
+
+might contain:
+
+{
+    username: "test",
+    email: "test@test.com",
+    ...
+}
+
+Therefore:
+
+const user = req.user;
+
+stores that user in a local variable.
+
+3. Fetch posts
+
+The complicated-looking part is:
+```js
+const posts = await Promise.all(
+    (await postModel.find({}).populate("user").lean()).map(async (post) => {
+        ...
+    })
+);
+```
+
+Let's break this into pieces instead of trying to understand everything at once.
+
+The innermost operation is:
+
+postModel.find({})
+4. postModel.find({})
+postModel.find({})
+
+means:
+
+"Find all documents in the posts collection."
+
+It's basically:
+
+Posts collection
+        ↓
+Give me every post
+
+For example MongoDB might return:
+
+[
+    {
+        _id: "P1",
+        caption: "Hello",
+        imgUrl: "image1.jpg",
+        user: "U1"
+    },
+
+    {
+        _id: "P2",
+        caption: "Good morning",
+        imgUrl: "image2.jpg",
+        user: "U2"
+    }
+]
+
+Notice:
+
+user: "U1"
+
+is just an ObjectId.
+
+5. .populate("user")
+
+Then:
+
+.populate("user")
+
+tells Mongoose:
+
+"For the user field in each post, find the corresponding User document."
+
+Assuming your schema is:
+
+const postSchema = new mongoose.Schema({
+
+    caption: String,
+
+    imgUrl: String,
+
+    user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User"
+    }
+
+});
+
+Mongoose knows:
+
+post.user
+     ↓
+ObjectId
+     ↓
+User model
+
+So:
+
+Before populate
+{
+    caption: "Hello",
+    user: "U1"
+}
+After populate
+{
+    caption: "Hello",
+
+    user: {
+        _id: "U1",
+        username: "test",
+        email: "test@test.com",
+        profileImage: "..."
+    }
+}
+
+So your comment is correct:
+
+populate("user") replaces the referenced ObjectId with the corresponding user document.
+
+6. .lean()
+
+You have:
+
+.lean()
+
+This tells Mongoose:
+
+"Give me normal JavaScript objects instead of full Mongoose documents."
+
+Without lean():
+
+post
+
+is a Mongoose document with Mongoose-specific methods and behavior.
+
+With:
+
+.lean()
+
+you get a plain JavaScript object.
+
+For example:
+
+{
+    _id: "...",
+    caption: "Hello",
+    imgUrl: "...",
+    user: {...}
+}
+
+This is useful here because you're going to modify the post:
+
+post.isLiked = Boolean(isLiked);
+
+and return it as JSON.
+
+7. Now .map()
+
+After this:
+
+(await postModel.find({}).populate("user").lean())
+
+you have:
+
+[
+    post1,
+    post2,
+    post3,
+    post4
+]
+
+Then:
+
+.map(async (post) => {
+
+means:
+
+"Go through every post and perform this async operation."
+
+For example:
+
+post1 → check whether user liked it
+post2 → check whether user liked it
+post3 → check whether user liked it
+post4 → check whether user liked it
+8. Check whether the user liked the post
+
+Inside the map:
+
+const isLiked = await likeModel.findOne({
+    user: user.username,
+    post: post._id,
+});
+
+This is checking the Like collection.
+
+Suppose your Like collection contains:
+
+[
+    {
+        user: "test",
+        post: "P1"
+    },
+
+    {
+        user: "rahul",
+        post: "P2"
+    }
+]
+
+For the current logged-in user:
+
+user.username = "test"
+
+and current post:
+
+post._id = "P1"
+
+Mongoose executes conceptually:
+
+Find a Like where:
+
+user = "test"
+AND
+post = "P1"
+9. What does findOne() return?
+
+If a matching like exists:
+
+isLiked = {
+    _id: "...",
+    user: "test",
+    post: "P1"
+}
+
+If there isn't one:
+
+isLiked = null
+
+So:
+
+User liked post
+      ↓
+isLiked = like document
+
+User didn't like post
+      ↓
+isLiked = null
+10. Boolean(isLiked)
+
+Then:
+
+post.isLiked = Boolean(isLiked);
+
+This converts the result into a simple boolean.
+
+If a like exists
+Boolean({
+    _id: "...",
+    user: "test"
+})
+
+becomes:
+
+true
+If no like exists
+Boolean(null)
+
+becomes:
+
+false
+
+So:
+
+post.isLiked
+
+will always be:
+
+true
+
+or:
+
+false
+11. Why add isLiked to the post?
+
+This is for your frontend.
+
+Without it, your frontend receives:
+
+{
+    caption: "Hello",
+    imgUrl: "...",
+    user: {...}
+}
+
+But the frontend doesn't know:
+
+"Did the current user like this post?"
+
+With:
+
+post.isLiked = Boolean(isLiked);
+
+it receives:
+
+{
+    caption: "Hello",
+    imgUrl: "...",
+    user: {...},
+    isLiked: true
+}
+
+Now your React component can do:
+
+<button>
+    {post.isLiked ? "❤️" : "♡"}
+</button>
+12. return post
+
+Then:
+
+return post;
+
+returns the modified post from the .map() callback.
+
+So:
+
+post1 → return post1
+post2 → return post2
+post3 → return post3
+
+But each one now contains:
+
+isLiked
+13. Why Promise.all()?
+
+This is the most important asynchronous part.
+
+Your map contains:
+
+.map(async (post) => {
+
+An async callback always returns a Promise.
+
+So:
+
+posts.map(async (post) => ...)
+
+produces something conceptually like:
+
+[
+    Promise,
+    Promise,
+    Promise,
+    Promise
+]
+
+You don't want the Promises.
+
+You want the actual posts.
+
+That's why you use:
+
+await Promise.all(...)
+
+Promise.all() waits for all those asynchronous operations to finish.
+
+Conceptually:
+
+post1 → Promise ─┐
+post2 → Promise ─┤
+post3 → Promise ─┼──→ Promise.all() → actual posts
+post4 → Promise ─┘
+
+So:
+
+const posts = await Promise.all(...)
+
+finally gives:
+
+[
+    post1,
+    post2,
+    post3,
+    post4
+]
+
+with isLiked added.
+
+14. Your entire expression expanded
+
+This:
+```js
+const posts = await Promise.all(
+    (await postModel.find({}).populate("user").lean())
+        .map(async (post) => {
+
+            const isLiked = await likeModel.findOne({
+                user: user.username,
+                post: post._id,
+            });
+
+            post.isLiked = Boolean(isLiked);
+
+            return post;
+        })
+);
+
+is easier to understand if written in steps:
+
+// 1. Get all posts
+const postsFromDB = await postModel
+    .find({})
+    .populate("user")
+    .lean();
+
+
+// 2. Process every post
+const postPromises = postsFromDB.map(async (post) => {
+
+    // 3. Check whether current user liked this post
+    const isLiked = await likeModel.findOne({
+        user: user.username,
+        post: post._id
+    });
+
+    // 4. Add true/false to post
+    post.isLiked = Boolean(isLiked);
+
+    // 5. Return modified post
+    return post;
+});
+
+
+// 6. Wait for all post processing to finish
+const posts = await Promise.all(postPromises);
+```
+
+This version is much easier to understand, and I would recommend writing it this way while you're learning.
+
+Once you're comfortable, you can compress it into the original version.
+
+15. Finally, send response
+
+You have:
+
+if (post) {
+
+There is a mistake here.
+
+You created:
+
+const posts = ...
+
+but you're checking:
+
+if (post)
+
+Those are different variables.
+
+You should check:
+
+if (posts)
+
+But there's another issue: posts is normally an array.
+
+Even an empty array:
+
+[]
+
+is truthy in JavaScript.
+
+So this:
+
+if (posts)
+
+will be true even if there are zero posts.
+
+Better:
+
+```js
+if (posts.length > 0) {
+    return res.status(200).json({
+        message: "posts fetched successfully",
+        posts
+    });
+}
+
+return res.status(404).json({
+    message: "no post found"
+});
+```
+
+Also, 404 is more appropriate than 409 for "no posts found"; 409 Conflict generally means the request conflicts with the current state of the resource.
+
+Final cleaned-up controller
+
+I'd write your controller like this:
+```js
+async function getFeedController(req, res) {
+
+    const user = req.user;
+
+    // Get all posts and replace the user ObjectId
+    // with the actual user document.
+    const postsFromDB = await postModel
+        .find({})
+        .populate("user")
+        .lean();
+
+
+    // Check whether the current user has liked
+    // each individual post.
+    const postPromises = postsFromDB.map(async (post) => {
+
+        const isLiked = await likeModel.findOne({
+            user: user.username,
+            post: post._id
+        });
+
+        // Convert the result into true/false.
+        post.isLiked = Boolean(isLiked);
+
+        return post;
+    });
+
+
+    // Wait for all like-checking operations.
+    const posts = await Promise.all(postPromises);
+
+
+    if (posts.length > 0) {
+
+        return res.status(200).json({
+            message: "posts fetched successfully",
+            posts
+        });
+
+    }
+
+    return res.status(404).json({
+        message: "no post found"
+    });
+}
+```
+The final data sent to your React frontend looks roughly like:
+[
+    {
+        _id: "...",
+        caption: "test_caption_1",
+        imgUrl: "https://ik.imagekit.io/...",
+        
+        user: {
+            _id: "...",
+            username: "test",
+            profileImage: "https://..."
+        },
+
+        isLiked: true
+    },
+
+    {
+        _id: "...",
+        caption: "test_caption_2",
+        imgUrl: "https://ik.imagekit.io/...",
+
+        user: {
+            username: "rahul",
+            profileImage: "https://..."
+        },
+
+        isLiked: false
+    }
+]
+
+So your frontend gets everything it needs to render the feed: post content, image, user information, and whether the current user has liked each post.
+

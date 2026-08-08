@@ -1378,3 +1378,17 @@ Backend	Processes requests, interacts with the database, and returns responses.
 The hook layer acts as a bridge between your UI and your application's state or services. It hides implementation details so components can focus on rendering rather than managing how data is obtained or updated.
 
 
+----------------------------
+**HOOK LAYER**
+Custom Hooks are user-defined functions that encapsulate reusable logic. They enhance code reusability and readability by sharing behavior between components.
+
+ook layer acts as the Business Logic Layer that separates complex state management, data processing, and side effects from the user interface (UI). By placing custom hooks between your visual components and your raw data endpoints, you prevent components from becoming bloated and ensure that the UI is only responsible for rendering data and capturing user interactions
+
+Core Responsibilities of the Hook Layer ->
+Encapsulates Business Logic: It processes, filters, and transforms raw data before it reaches the UI.
+
+Manages Component State: It abstracts state manipulation away from view files using tools like useState or useReducer.
+
+Orchestrates Side Effects: It isolates operations like API polling, logging, or event listeners using useEffect.
+
+Acts as an API/Data Abstractor: It communicates directly with external data access clients or global stores (e.g., Axios instances or Redux).

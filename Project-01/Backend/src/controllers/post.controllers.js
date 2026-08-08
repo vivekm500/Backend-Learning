@@ -200,9 +200,54 @@ async function likePostController(req, res){
 }
 
 
+
+// getFeedController
+async function getFeedController(req, res){
+
+  const user = req.user
+
+  // get all the post and check each post if it is liked by the loggedin user
+  const posts = await Promise.all(
+    (await postModel.find({}).populate("user").lean()).map(async (post) => {
+      const isLiked = await likeModel.findOne({
+        user: user.username,
+        post: post._id,
+      });
+
+      // modify the post and add a boolean 
+      post.isLiked = Boolean(isLiked);
+
+      // return the modified post
+      return post;
+    }),
+  );
+  
+  
+  // here populate("usrer field") will replace the user: objectId with  user's information(data) from User collection
+
+  /**
+   *  opulate() is a Mongoose method that replaces a referenced ObjectId with the actual document from another collection.
+
+Think of it as performing a join between two MongoDB collections.
+   */
+
+  if (posts.length > 0) {
+    return res.status(200).json({
+      message: "posts fetched successfully",
+      posts,
+    });
+  } else {
+    return res.status(404).json({
+      message: "no post found",
+    });
+  }
+}
+
+
 module.exports = {
     createPostController,
     getPostController,
     getPostDetailsController,
-    likePostController
+    likePostController,
+    getFeedController
 };

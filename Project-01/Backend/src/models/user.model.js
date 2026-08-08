@@ -14,6 +14,7 @@ const userSchema = new mongoose.Schema({
   password: {
     type: String,
     required: [true, "password is required"],
+    select: false // we will only save password in database but not read it from DB
   },
   bio: String,
   profileImage: {
