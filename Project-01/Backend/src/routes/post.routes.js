@@ -42,7 +42,14 @@ postRouter.get("/details/:postId", identifyUser, postController.getPostDetailsCo
  * @acess private
  */
 
-postRouter.post("/like/:postid", identifyUser, postController.likePostController)
+postRouter.post("/like/:postId", identifyUser, postController.likePostController)
+
+/**
+ * @route POST -> "/api/posts/unlike/:postid"
+ * @description unlike a post with the id provided in the params
+ * @access private
+ */
+postRouter.post("/unlike/:postId", identifyUser, postController.unLikePostController)
 
 
 /**

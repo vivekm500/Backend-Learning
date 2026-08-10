@@ -56,7 +56,7 @@ const Register = () => {
             placeholder="enter password"
           />
 
-          <button type="submit">Register</button>
+          <button className='button primary-button' type="submit">Register</button>
         </form>
         <p>
           Already have an account? <Link className='toggleAuthForm' to="/login">Login</Link>

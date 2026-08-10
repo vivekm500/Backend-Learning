@@ -1,6 +1,6 @@
 // import { RouterProvider } from "react-router"
 import AppRoutes from "./AppRoutes.jsx"
-import "./style.scss"
+import './features/shared/global.scss'
 import { AuthProvider } from "./features/auth/auth.context.jsx"
 import { PostContextProvider } from "./features/post/post.context.jsx"
 

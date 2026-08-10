@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import '../style/form.scss'
+
 import { Link } from 'react-router'
 import { useAuth } from '../hooks/useAuth.jsx'
 import { useNavigate } from 'react-router'
@@ -41,7 +42,7 @@ const Login = () => {
                  name='password' 
                  placeholder='enter your password' />
 
-                <button type='submit'>Login</button>
+                <button className='button primary-button' type='submit'>Login</button>
             </form>
             <p>Don't have an account <Link className='toggleAuthForm' to= '/register'>Register</Link></p>
         </div>

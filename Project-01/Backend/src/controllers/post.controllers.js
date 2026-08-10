@@ -178,9 +178,9 @@ async function likePostController(req, res){
   const username = req.user.username
 
   // take out the postid provided in params of api
-  const postid = req.params.postid
+  const postId = req.params.postId
 
-  const post = postModel.findById(postid)
+  const post = await postModel.findById(postId)
 
   if(!post){
     return res.status(404).json({
@@ -188,15 +188,57 @@ async function likePostController(req, res){
     })
   }
 
-  const like = likeModel.create({
-    post: postid,
+  const isLiked = await likeModel.findOne({
+    post: postId,
     user: username
   })
+
+  if(isLiked){
+    return res.status(200).json({
+      message: "post is already liked by you"
+    })
+  }
+
+  let like;
+  if(!isLiked){
+    like = await likeModel.create({
+    post: postId,
+    user: username
+  })
+}
 
   res.status(200).json({
     message: "post liked successfully",
     like
   })
+}
+
+// unlike a post
+async function unLikePostController(req, res){
+  const postId = req.params.postId
+
+  const username = req.user.username
+
+  const isLiked = await likeModel.findOne({
+    post: postId,
+    user: username
+  })
+
+  if(!isLiked){
+    return res.status(409).json({
+      message: `post is not liked`
+    })
+  }
+  else{
+  await likeModel.findOneAndDelete({
+    _id: isLiked._id
+  })
+
+  return res.status(200).json({
+    message: "post unLiked successfully"
+  })
+}
+
 }
 
 
@@ -207,8 +249,9 @@ async function getFeedController(req, res){
   const user = req.user
 
   // get all the post and check each post if it is liked by the loggedin user
+  // we have sorted the post on the basis of id that last created post should come first
   const posts = await Promise.all(
-    (await postModel.find({}).populate("user").lean()).map(async (post) => {
+    (await postModel.find({}).sort({_id: -1}).populate("user").lean()).map(async (post) => {
       const isLiked = await likeModel.findOne({
         user: user.username,
         post: post._id,
@@ -249,5 +292,6 @@ module.exports = {
     getPostController,
     getPostDetailsController,
     likePostController,
-    getFeedController
+    getFeedController,
+    unLikePostController
 };

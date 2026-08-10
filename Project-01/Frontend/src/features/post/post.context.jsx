@@ -11,7 +11,7 @@ export const PostContextProvider = ({children})=>{
 
     const [post, setPost] = useState(null);
 
-    const [feed, setFeed] = useState(null);
+    const [feed, setFeed] = useState([]);
 
 
     return (

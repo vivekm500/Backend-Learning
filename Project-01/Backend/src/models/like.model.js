@@ -8,7 +8,7 @@ const likeSchema = new mongoose.Schema({
     },
     user: {
         type: String,
-        requred: [true, "username is required for creating a like"]
+        required: [true, "username is required for creating a like"]
     }
 },
 {
@@ -16,7 +16,7 @@ const likeSchema = new mongoose.Schema({
 })
 
 // compound unique indexing
-likeSchema.index({posts: 1, user: 1}, {unique: true})
+likeSchema.index({post: 1, user: 1}, {unique: true})
 
 // model
 const likeModel = mongoose.model("likes", likeSchema)

@@ -33,24 +33,24 @@ main{
         border-radius: 1rem;
     }
 
-    button{
-        border: none;
-        outline: none;
-        padding-inline: 1.5rem;
-        padding-block: 1rem;
-        border-radius: 1rem;
-        background-color: rgb(52, 52, 226);
-        color: white;
-        cursor: pointer;
-        font-size: large;
+    // button{
+    //     border: none;
+    //     outline: none;
+    //     padding-inline: 1.5rem;
+    //     padding-block: 1rem;
+    //     border-radius: 1rem;
+    //     background-color: rgb(52, 52, 226);
+    //     color: white;
+    //     cursor: pointer;
+    //     font-size: large;
 
-        transition: all ease-in-out 0.3s;
+    //     transition: all ease-in-out 0.3s;
 
-        // when button is active
-        &:active{
-            transform: scale(0.9);
-        }
-    }
+    //     // when button is active
+    //     &:active{
+    //         transform: scale(0.9);
+    //     }
+    // }
 }
 
 .toggleAuthForm{
