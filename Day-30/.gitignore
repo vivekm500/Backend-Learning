@@ -1,3 +1,8 @@
 node_modules/
+<<<<<<< HEAD
 /postman
 .env
+=======
+postman
+.env
+>>>>>>> d289c0c260f4689f641dbfb968a683fed5dbdb5f
